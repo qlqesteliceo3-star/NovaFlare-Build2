@@ -1,14 +1,21 @@
 name: Build Android APK
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: krdlab/setup-haxe@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.2.5
-      - name: Install dependencies
+
+      - name: Install Haxelib
         run: |
           haxelib setup ~/haxelib
           haxelib install lime
@@ -17,10 +24,14 @@ jobs:
           haxelib install flixel-addons
           haxelib install hscript
           haxelib install hxcpp
-          haxelib install lime-samples
+          haxelib git hxCodec https://github.com/polybiusproxy/hxCodec
+          haxelib run lime setup
+          haxelib run lime setup flixel
+
       - name: Build
         run: haxelib run lime build android -final
-      - name: Upload
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: APK-Final
