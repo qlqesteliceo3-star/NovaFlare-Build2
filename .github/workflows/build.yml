@@ -1,1 +1,28 @@
-
+name: Build Android APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.2.5
+      - name: Install dependencies
+        run: |
+          haxelib setup ~/haxelib
+          haxelib install lime
+          haxelib install openfl
+          haxelib install flixel
+          haxelib install flixel-addons
+          haxelib install hscript
+          haxelib install hxcpp
+          haxelib install lime-samples
+      - name: Build
+        run: haxelib run lime build android -final
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: APK-Final
+          path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+          
